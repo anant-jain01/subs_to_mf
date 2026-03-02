@@ -80,6 +80,3 @@ Build an analysis tool (Excel + Web App) that calculates the "Wealth Opportunity
 - **Feature 2 (Calculation):** Show a table comparing growth across the 3 benchmarks.
 - **Feature 3 (Insight):** Display the "Best Return" after 3, 5, and 10 years.
 - **Feature 4 (Visuals):** Line chart showing the widening gap between "Total Spent" vs "Potential Wealth."
-
-## 4. Inspiration Reference
-Based on Sandeep Jethwani’s analysis of the subscription economy and wealth creation.

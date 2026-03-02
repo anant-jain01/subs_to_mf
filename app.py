@@ -957,7 +957,7 @@ def main():
         f"<div style='font-size:10px;font-weight:700;color:#EF9A9A;"
         f"text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;'>Wealth Opportunity Cost</div>"
         f"<div style='font-size:clamp(1rem,3.5vw,1.4rem);font-weight:800;color:#FF5252;margin-bottom:4px;'>"
-        f"{fmt(gap)} missed over 10 years</div>"
+        f"{fmt(gap)} of profits missed over 10 years</div>"
         f"<div style='font-size:12px;color:#B0BEC5;line-height:1.5;'>"
         f"Spending <b style='color:#EF9A9A;'>{fmt(total_monthly)}/month</b> on subscriptions "
         f"instead of an Equity SIP costs you <b style='color:#FF5252;'>{fmt(gap)}</b> "
