@@ -649,26 +649,42 @@ def section(title, subtitle=""):
 
 
 def totals_strip(portfolio):
-    tm      = sum(s["price"] for s in portfolio)
-    spent   = tm * 120
-    fd_val  = sip_fv(tm, 6.0,  120)
-    dbt_val = sip_fv(tm, 8.0,  120)
-    eq_val  = sip_fv(tm, 12.0, 120)
+    tm    = sum(s["price"] for s in portfolio)
+    daily = tm / 30
+
+    # ── Year-horizon selector ────────────────────────────────────────────────
+    horizon_labels = {"1 Year": 1, "3 Years": 3, "5 Years": 5, "10 Years": 10}
+    sel = st.radio(
+        "Projection horizon",
+        list(horizon_labels.keys()),
+        index=3,
+        horizontal=True,
+        label_visibility="collapsed",
+        key="totals_horizon",
+    )
+    yrs     = horizon_labels[sel]
+    months  = yrs * 12
+    yr_label = sel  # e.g. "10 Years"
+
+    spent   = tm * months
+    fd_val  = sip_fv(tm, 6.0,  months)
+    dbt_val = sip_fv(tm, 8.0,  months)
+    eq_val  = sip_fv(tm, 12.0, months)
     gap     = eq_val - spent
-    daily   = tm / 30
 
     st.markdown(
         f"<div style='background:linear-gradient(135deg,#0F1629,#141C35,#0A1628);"
         f"border:1px solid #1E2D50;border-radius:14px;padding:18px 20px;margin:4px 0 14px;overflow-x:auto;'>"
         f"<div style='font-size:10px;color:#6B7A99;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;'>"
         f"Portfolio Total &nbsp;&middot;&nbsp; {len(portfolio)} subscription{'s' if len(portfolio)!=1 else ''}"
+        f"&nbsp;&middot;&nbsp; <span style='color:#4FC3F7;'>{yr_label} projection</span>"
         f"</div>"
         f"<div style='display:flex;flex-wrap:wrap;gap:16px 28px;align-items:flex-end;'>"
         f"<div><div style='font-size:11px;color:#6B7A99;margin-bottom:1px;'>Monthly Burn</div>"
         f"<div style='font-size:clamp(1.5rem,5vw,2.4rem);font-weight:800;color:#FFFFFF;line-height:1;'>{fmt(tm)}</div>"
         f"<div style='font-size:11px;color:#6B7A99;margin-top:2px;'>{fmt(daily,short=True)}/day &nbsp;&middot;&nbsp; {fmt(tm*12,short=True)}/yr</div></div>"
         f"<div style='width:1px;background:#1E2D50;height:50px;flex-shrink:0;'></div>"
-        f"<div><div style='font-size:11px;color:#6B7A99;margin-bottom:1px;'>10Y Spent</div>"
+        f"<div><div style='font-size:11px;color:#6B7A99;margin-bottom:1px;'>{yr_label} Spent</div>"
         f"<div style='font-size:clamp(1.1rem,3.5vw,1.6rem);font-weight:700;color:#EF9A9A;line-height:1;'>{fmt(spent)}</div>"
         f"<div style='font-size:10px;color:#6B7A99;'>if never invested</div></div>"
         f"<div style='width:1px;background:#1E2D50;height:50px;flex-shrink:0;'></div>"
@@ -945,7 +961,6 @@ def main():
         f"<div style='font-size:12px;color:#B0BEC5;line-height:1.5;'>"
         f"Spending <b style='color:#EF9A9A;'>{fmt(total_monthly)}/month</b> on subscriptions "
         f"instead of an Equity SIP costs you <b style='color:#FF5252;'>{fmt(gap)}</b> "
-        f"in potential wealth — equal to {coffees} cups of chai every day!"
         f"</div></div></div>",
         unsafe_allow_html=True,
     )
