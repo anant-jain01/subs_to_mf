@@ -3,6 +3,7 @@ Subscription Opportunity Cost Calculator - India Edition
 Mobile-first, deployment-ready Streamlit app.
 """
 
+import base64
 import io
 import os
 import numpy as np
@@ -744,47 +745,58 @@ def main():
 
     st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
 
-    # ── Top contact bar ────────────────────────────────────────────────────────
+    # ── Header (logo + title + contact) via components.html to bypass sanitiser ─
     import streamlit.components.v1 as _components
+    _logo_b64 = ""
+    _logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.png")
+    if os.path.exists(_logo_path):
+        with open(_logo_path, "rb") as _f:
+            _logo_b64 = base64.b64encode(_f.read()).decode()
+    _logo_tag = (
+        f"<img src='data:image/png;base64,{_logo_b64}' "
+        f"style='height:56px;width:auto;object-fit:contain;display:block;flex-shrink:0;'>"
+        if _logo_b64 else ""
+    )
     _components.html(
-        "<div style='background:#080C18;border-bottom:1px solid #1A2340;"
-        "padding:5px 20px;font-size:10.5px;color:#6B7A99;font-family:sans-serif;"
-        "display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;'>"
-        "<span>📍 B1/H3 Mohan Co-op Industrial Area, Mathura Road, New Delhi – 110044</span>"
-        "<span>&middot;</span>"
-        "<span>📞 <a href='tel:+919315569603' style='color:#6B7A99;text-decoration:none;'>+91 93155 69603</a></span>"
-        "<span>&middot;</span>"
-        "<span>📧 <a href='mailto:support@3kip.in' style='color:#6B7A99;text-decoration:none;'>support@3kip.in</a></span>"
-        "<span>&middot;</span>"
-        "<span>🌐 <a href='https://www.3kip.in' target='_blank' style='color:#4FC3F7;text-decoration:none;'>www.3kip.in</a></span>"
-        "</div>",
-        height=36,
+        f"""
+        <div style="margin:0;padding:0;font-family:'Segoe UI',sans-serif;background:#0A0E1A;">
+          <!-- contact bar -->
+          <div style="background:#080C18;border-bottom:1px solid #1A2340;
+                      padding:5px 20px;font-size:10px;color:#6B7A99;
+                      display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;">
+            <span>📍 B1/H3 Mohan Co-op Industrial Area, Mathura Road, New Delhi – 110044</span>
+            <span style="color:#1A2340;">|</span>
+            <span>📞 <a href="tel:+919315569603" style="color:#6B7A99;text-decoration:none;">+91 93155 69603</a></span>
+            <span style="color:#1A2340;">|</span>
+            <span>📧 <a href="mailto:support@3kip.in" style="color:#6B7A99;text-decoration:none;">support@3kip.in</a></span>
+            <span style="color:#1A2340;">|</span>
+            <span>🌐 <a href="https://www.3kip.in" target="_blank" style="color:#4FC3F7;text-decoration:none;">www.3kip.in</a></span>
+          </div>
+          <!-- hero row -->
+          <div style="display:flex;align-items:center;gap:18px;padding:14px 20px 12px;
+                      background:linear-gradient(135deg,#0F1629 0%,#0A0E1A 100%);
+                      border-bottom:1px solid #1A2340;flex-wrap:wrap;">
+            {_logo_tag}
+            <div style="flex:1;min-width:200px;">
+              <div style="color:#FFFFFF;margin:0;font-size:clamp(1.1rem,3.5vw,1.6rem);
+                          font-weight:800;letter-spacing:-.02em;line-height:1.2;">
+                📊 Subscription Opportunity Cost
+              </div>
+              <div style="color:#6B7A99;margin:4px 0 0;font-size:11.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <span>India Edition &middot; What your subscriptions could build as SIPs</span>
+                <span style="background:#141C35;border:1px solid #1E2D50;border-radius:20px;
+                             padding:3px 10px;font-size:10px;color:#4FC3F7;font-weight:600;
+                             letter-spacing:.06em;white-space:nowrap;">
+                  FD 6% &middot; Debt 8% &middot; Equity 12%
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        """,
+        height=110,
         scrolling=False,
     )
-
-    # ── Hero header ────────────────────────────────────────────────────────────
-    logo_col, title_col = st.columns([1, 5])
-    with logo_col:
-        logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.png")
-        if os.path.exists(logo_path):
-            st.image(logo_path, use_container_width=True)
-    with title_col:
-        st.markdown(
-            "<div style='background:linear-gradient(135deg,#0F1629 0%,#0A0E1A 100%);"
-            "padding:12px 16px 10px;border-radius:10px;margin:4px 0 0;'>"
-            "<h1 style='color:#FFFFFF;margin:0;font-size:clamp(1.15rem,4vw,1.7rem);"
-            "font-weight:800;letter-spacing:-.02em;line-height:1.15;'>"
-            "📊 Subscription Opportunity Cost</h1>"
-            "<p style='color:#6B7A99;margin:5px 0 0;font-size:12px;'>"
-            "India Edition &nbsp;&middot;&nbsp; What your subscriptions could build as SIPs"
-            "&nbsp;&nbsp;"
-            "<span style='background:#141C35;border:1px solid #1E2D50;border-radius:20px;"
-            "padding:3px 10px;font-size:10px;color:#4FC3F7;font-weight:600;"
-            "letter-spacing:.06em;white-space:nowrap;'>FD 6% &middot; Debt 8% &middot; Equity 12%</span>"
-            "</p></div>",
-            unsafe_allow_html=True,
-        )
-    st.markdown("<div style='height:6px;'></div>", unsafe_allow_html=True)
 
     if "portfolio" not in st.session_state:
         st.session_state.portfolio = []
