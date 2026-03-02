@@ -655,6 +655,11 @@ hr { border-color: #1A2340 !important; margin: 14px 0 !important; }
     .stTabs [data-baseweb="tab"] { font-size: 10px !important; padding: 5px 7px !important; }
     [data-testid="stDataFrame"] tbody tr td { font-size: 11px !important; }
 }
+
+/* Hide Streamlit branding */
+#MainMenu { visibility: hidden !important; }
+footer { visibility: hidden !important; }
+header { visibility: hidden !important; }
 </style>
 """
 
