@@ -3,7 +3,9 @@ Subscription Opportunity Cost Calculator - India Edition
 Mobile-first, deployment-ready Streamlit app.
 """
 
+import base64
 import io
+import os
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
@@ -15,6 +17,15 @@ try:
     SCRAPING_AVAILABLE = True
 except ImportError:
     SCRAPING_AVAILABLE = False
+
+
+def _logo_b64() -> str:
+    """Return base64-encoded logo.png, or empty string if not found."""
+    logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
+    if not os.path.exists(logo_path):
+        return ""
+    with open(logo_path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # DATA
@@ -742,10 +753,17 @@ def main():
     st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
 
     # Hero header
+    _logo = _logo_b64()
+    _logo_html = (
+        f"<img src='data:image/png;base64,{_logo}' "
+        f"style='height:48px;width:auto;object-fit:contain;display:block;' alt='3KIP logo'>"
+        if _logo else ""
+    )
     st.markdown(
         "<div style='background:linear-gradient(135deg,#0F1629 0%,#0A0E1A 100%);"
         "border-bottom:1px solid #1A2340;padding:18px 20px 14px;margin:-1px -1rem 0;'>"
         "<div style='display:flex;align-items:center;gap:12px;flex-wrap:wrap;'>"
+        # ── Left: tool title ──────────────────────────────────────────────────
         "<div style='font-size:26px;'>📊</div>"
         "<div style='flex:1;min-width:180px;'>"
         "<h1 style='color:#FFFFFF;margin:0;font-size:clamp(1.15rem,4vw,1.7rem);"
@@ -757,6 +775,20 @@ def main():
         "<span style='background:#141C35;border:1px solid #1E2D50;border-radius:20px;"
         "padding:4px 12px;font-size:10px;color:#4FC3F7;font-weight:600;"
         "letter-spacing:.06em;white-space:nowrap;'>FD 6% &middot; Debt 8% &middot; Equity 12%</span>"
+        # ── Right: company card ───────────────────────────────────────────────
+        "<div style='margin-left:auto;display:flex;align-items:center;gap:14px;"
+        "background:#0F1629;border:1px solid #1E2D50;border-radius:12px;"
+        "padding:10px 16px;flex-wrap:wrap;'>"
+        + _logo_html +
+        "<div style='font-size:11px;color:#90A4AE;line-height:1.7;'>"
+        "<div style='font-size:13px;font-weight:700;color:#E8EAF0;margin-bottom:2px;'>"
+        "<a href='https://www.3kip.in' target='_blank' "
+        "style='color:#4FC3F7;text-decoration:none;'>3KIP</a></div>"
+        "<div>📍 B1/H3 Mohan Co-op Industrial Area, Mathura Rd, New Delhi – 110044</div>"
+        "<div>📧 <a href='mailto:support@3kip.in' style='color:#90A4AE;'>support@3kip.in</a>"
+        "&nbsp;&middot;&nbsp; 📞 <a href='tel:+919315569603' style='color:#90A4AE;'>+91 93155 69603</a></div>"
+        "<div>🌐 <a href='https://www.3kip.in' target='_blank' style='color:#4FC3F7;'>www.3kip.in</a></div>"
+        "</div></div>"
         "</div></div>"
         "<div style='height:10px;'></div>",
         unsafe_allow_html=True,
