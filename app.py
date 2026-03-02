@@ -738,7 +738,6 @@ def main():
                 "**Subscription Opportunity Cost Calculator — India Edition**\n\n"
                 "Visualize the true wealth cost of monthly subscriptions "
                 "vs SIP returns in FD, Debt & Equity.\n\n"
-                "Built with Streamlit · Inspired by Sandeep Jethwani"
             )
         },
     )
@@ -759,7 +758,18 @@ def main():
     )
     _components.html(
         f"""
+        <style>
+          .qbtn {{
+            display:inline-block;padding:7px 16px;background:#4FC3F7;color:#0A0E1A;
+            font-weight:700;font-size:11px;border-radius:20px;text-decoration:none;
+            letter-spacing:.04em;white-space:nowrap;border:none;cursor:pointer;
+            transition:background .2s;
+          }}
+          .qbtn:hover {{ background:#81D4FA; }}
+        </style>
         <div style="margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;background:#0A0E1A;">
+
+          <!-- contact bar -->
           <div style="background:#060A14;border-bottom:1px solid #243050;
                       padding:6px 20px;font-size:10.5px;color:#90A4AE;
                       display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center;">
@@ -771,16 +781,26 @@ def main():
             <span style="color:#4FC3F7;">|</span>
             <span>🌐 <a href="https://www.3kip.in" target="_blank" style="color:#4FC3F7;text-decoration:none;">www.3kip.in</a></span>
           </div>
-          <div style="display:flex;align-items:center;gap:18px;padding:12px 20px 10px;
+
+          <!-- hero row -->
+          <div style="display:flex;align-items:center;gap:16px;padding:12px 20px 11px;
                       background:linear-gradient(135deg,#0F1629 0%,#0A0E1A 100%);
                       border-bottom:1px solid #1A2340;flex-wrap:wrap;">
-            {_logo_tag}
+
+            <!-- logo on white pill so it stands out -->
+            {f'''<div style="background:#FFFFFF;border-radius:10px;padding:6px 10px;
+                            display:flex;align-items:center;flex-shrink:0;">
+                   {_logo_tag}
+                 </div>''' if _logo_b64 else ''}
+
+            <!-- title + subtitle -->
             <div style="flex:1;min-width:200px;">
-              <div style="color:#FFFFFF;font-size:clamp(1.1rem,3.5vw,1.55rem);
+              <div style="color:#FFFFFF;font-size:clamp(1.05rem,3vw,1.5rem);
                           font-weight:800;letter-spacing:-.02em;line-height:1.2;">
                 📊 Subscription Opportunity Cost
               </div>
-              <div style="color:#6B7A99;margin:4px 0 0;font-size:11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <div style="color:#6B7A99;margin:4px 0 0;font-size:11px;
+                          display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                 <span>India Edition &middot; What your subscriptions could build as SIPs</span>
                 <span style="background:#141C35;border:1px solid #1E2D50;border-radius:20px;
                              padding:3px 10px;font-size:10px;color:#4FC3F7;font-weight:600;
@@ -789,10 +809,14 @@ def main():
                 </span>
               </div>
             </div>
+
+            <!-- Contact Us button -->
+            <a class="qbtn" href="mailto:support@3kip.in">📬 Contact Us</a>
+
           </div>
         </div>
         """,
-        height=120,
+        height=125,
         scrolling=False,
     )
 
@@ -1154,12 +1178,15 @@ def main():
     )
 
     st.markdown(
-        "<b style='color:#546E7A;'>Formula:</b> "
-        "FV = P \u00d7 [((1 + r)\u207f \u2212 1) / r] \u00d7 (1 + r) \u00a0\u00b7\u00a0 "
-        "Monthly compounding \u00a0\u00b7\u00a0 "
-        "Inspired by Sandeep Jethwani's Subscription Economy analysis<br>"
-        "Built with Streamlit, Plotly &amp; Pandas \u00a0\u00b7\u00a0 "
-        "Prices from public databases and may not reflect current rates"
+        "<div style='background:#060A14;border:1px solid #1A2340;border-radius:10px;"
+        "padding:14px 22px;max-width:900px;margin:8px auto 18px;"
+        "text-align:center;font-size:11px;color:#546E7A;line-height:2;'>"
+        "<span style='color:#4FC3F7;font-weight:700;'>Formula:</span> "
+        "FV = P \u00d7 [((1 + r)\u207f \u2212 1) / r] \u00d7 (1 + r)"
+        " &nbsp;&middot;&nbsp; Monthly compounding"
+        " &nbsp;&middot;&nbsp; Inspired by Sandeep Jethwani's Subscription Economy analysis<br>"
+        "<span style='color:#37474F;'>Built with Streamlit, Plotly &amp; Pandas"
+        " &nbsp;&middot;&nbsp; Prices from public databases and may not reflect current rates</span>"
         "</div>",
         unsafe_allow_html=True,
     )
