@@ -752,47 +752,51 @@ def main():
 
     st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
 
-    # Hero header
-    _logo = _logo_b64()
-    _logo_html = (
-        f"<img src='data:image/png;base64,{_logo}' "
-        f"style='height:48px;width:auto;object-fit:contain;display:block;' alt='3KIP logo'>"
-        if _logo else ""
-    )
+    # ── Top contact bar ────────────────────────────────────────────────────────
     st.markdown(
-        "<div style='background:linear-gradient(135deg,#0F1629 0%,#0A0E1A 100%);"
-        "border-bottom:1px solid #1A2340;padding:18px 20px 14px;margin:-1px -1rem 0;'>"
-        "<div style='display:flex;align-items:center;gap:12px;flex-wrap:wrap;'>"
-        # ── Left: tool title ──────────────────────────────────────────────────
-        "<div style='font-size:26px;'>📊</div>"
-        "<div style='flex:1;min-width:180px;'>"
-        "<h1 style='color:#FFFFFF;margin:0;font-size:clamp(1.15rem,4vw,1.7rem);"
-        "font-weight:800;letter-spacing:-.02em;line-height:1.15;'>"
-        "Subscription Opportunity Cost</h1>"
-        "<p style='color:#6B7A99;margin:3px 0 0;font-size:12px;'>"
-        "India Edition &nbsp;&middot;&nbsp; What your subscriptions could build as SIPs"
-        "</p></div>"
-        "<span style='background:#141C35;border:1px solid #1E2D50;border-radius:20px;"
-        "padding:4px 12px;font-size:10px;color:#4FC3F7;font-weight:600;"
-        "letter-spacing:.06em;white-space:nowrap;'>FD 6% &middot; Debt 8% &middot; Equity 12%</span>"
-        # ── Right: company card ───────────────────────────────────────────────
-        "<div style='margin-left:auto;display:flex;align-items:center;gap:14px;"
-        "background:#0F1629;border:1px solid #1E2D50;border-radius:12px;"
-        "padding:10px 16px;flex-wrap:wrap;'>"
-        + _logo_html +
-        "<div style='font-size:11px;color:#90A4AE;line-height:1.7;'>"
-        "<div style='font-size:13px;font-weight:700;color:#E8EAF0;margin-bottom:2px;'>"
-        "<a href='https://www.3kip.in' target='_blank' "
-        "style='color:#4FC3F7;text-decoration:none;'>3KIP</a></div>"
-        "<div>📍 B1/H3 Mohan Co-op Industrial Area, Mathura Rd, New Delhi – 110044</div>"
-        "<div>📧 <a href='mailto:support@3kip.in' style='color:#90A4AE;'>support@3kip.in</a>"
-        "&nbsp;&middot;&nbsp; 📞 <a href='tel:+919315569603' style='color:#90A4AE;'>+91 93155 69603</a></div>"
-        "<div>🌐 <a href='https://www.3kip.in' target='_blank' style='color:#4FC3F7;'>www.3kip.in</a></div>"
-        "</div></div>"
-        "</div></div>"
-        "<div style='height:10px;'></div>",
+        "<div style='background:#080C18;border-bottom:1px solid #1A2340;"
+        "padding:5px 20px;font-size:10.5px;color:#6B7A99;"
+        "display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;'>"
+        "<span>📍 B1/H3 Mohan Co-op Industrial Area, Mathura Road, New Delhi – 110044</span>"
+        "<span>&middot;</span>"
+        "<span>📞 <a href='tel:+919315569603' style='color:#6B7A99;text-decoration:none;'>+91 93155 69603</a></span>"
+        "<span>&middot;</span>"
+        "<span>📧 <a href='mailto:support@3kip.in' style='color:#6B7A99;text-decoration:none;'>support@3kip.in</a></span>"
+        "<span>&middot;</span>"
+        "<span>🌐 <a href='https://www.3kip.in' target='_blank' style='color:#4FC3F7;text-decoration:none;'>www.3kip.in</a></span>"
+        "</div>",
         unsafe_allow_html=True,
     )
+
+    # ── Hero header ────────────────────────────────────────────────────────────
+    _logo = _logo_b64()
+    logo_col, title_col = st.columns([1, 5])
+    with logo_col:
+        if _logo:
+            st.markdown(
+                f"<div style='padding:10px 0 4px;'>"
+                f"<img src='data:image/png;base64,{_logo}' "
+                f"style='max-height:70px;max-width:100%;width:auto;object-fit:contain;display:block;'>"
+                f"</div>",
+                unsafe_allow_html=True,
+            )
+    with title_col:
+        st.markdown(
+            "<div style='background:linear-gradient(135deg,#0F1629 0%,#0A0E1A 100%);"
+            "padding:12px 16px 10px;border-radius:10px;margin:4px 0 0;'>"
+            "<h1 style='color:#FFFFFF;margin:0;font-size:clamp(1.15rem,4vw,1.7rem);"
+            "font-weight:800;letter-spacing:-.02em;line-height:1.15;'>"
+            "📊 Subscription Opportunity Cost</h1>"
+            "<p style='color:#6B7A99;margin:5px 0 0;font-size:12px;'>"
+            "India Edition &nbsp;&middot;&nbsp; What your subscriptions could build as SIPs"
+            "&nbsp;&nbsp;"
+            "<span style='background:#141C35;border:1px solid #1E2D50;border-radius:20px;"
+            "padding:3px 10px;font-size:10px;color:#4FC3F7;font-weight:600;"
+            "letter-spacing:.06em;white-space:nowrap;'>FD 6% &middot; Debt 8% &middot; Equity 12%</span>"
+            "</p></div>",
+            unsafe_allow_html=True,
+        )
+    st.markdown("<div style='height:6px;'></div>", unsafe_allow_html=True)
 
     if "portfolio" not in st.session_state:
         st.session_state.portfolio = []
@@ -941,7 +945,7 @@ def main():
             unsafe_allow_html=True,
         )
 
-    # ── MAIN CONTENT ──────────────────────────────────────────────────────────
+    # ── MAIN CONTENT ────────────────────────────────────────────────────────── 
     portfolio = st.session_state.portfolio
 
     if not portfolio:
@@ -950,6 +954,7 @@ def main():
             "<div style='font-size:52px;margin-bottom:10px;'>💸</div>"
             "<h2 style='color:#FFFFFF;font-weight:700;font-size:1.2rem;margin:0 0 6px;'>"
             "Find out what your subscriptions truly cost</h2>"
+
             "<p style='color:#6B7A99;font-size:13px;max-width:400px;margin:0 auto;'>"
             "Search for an app in the sidebar or tap any card below to start.</p></div>",
             unsafe_allow_html=True,
