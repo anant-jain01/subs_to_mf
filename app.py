@@ -656,10 +656,12 @@ hr { border-color: #1A2340 !important; margin: 14px 0 !important; }
     [data-testid="stDataFrame"] tbody tr td { font-size: 11px !important; }
 }
 
-/* Hide Streamlit branding */
+/* Hide Streamlit branding — target only the badge/toolbar, not the header wrapper */
 #MainMenu { visibility: hidden !important; }
 footer { visibility: hidden !important; }
-header { visibility: hidden !important; }
+[data-testid="stToolbar"] { visibility: hidden !important; }
+[data-testid="stDecoration"] { display: none !important; }
+[data-testid="stStatusWidget"] { visibility: hidden !important; }
 </style>
 """
 
