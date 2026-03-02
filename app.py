@@ -811,7 +811,7 @@ def main():
             </div>
 
             <!-- Contact Us button -->
-            <a class="qbtn" href="mailto:support@3kip.in">📬 Contact Us</a>
+            <a class="qbtn" href="#for-queries">📬 Contact Us</a>
 
           </div>
         </div>
@@ -1162,7 +1162,7 @@ def main():
     )
 
     st.markdown(
-        "<div style='background:#0D1120;border:1px solid #1A2340;border-left:4px solid #4FC3F7;"
+        "<div id='for-queries' style='background:#0D1120;border:1px solid #1A2340;border-left:4px solid #4FC3F7;"
         "border-radius:0 10px 10px 0;padding:18px 22px;max-width:900px;margin:16px auto 8px;'>"
         "<div style='font-size:12px;font-weight:700;color:#4FC3F7;text-transform:uppercase;"
         "letter-spacing:.09em;margin-bottom:10px;'>📬 For Queries</div>"
