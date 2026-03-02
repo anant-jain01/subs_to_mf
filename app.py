@@ -1,7 +1,6 @@
 """
 Subscription Opportunity Cost Calculator - India Edition
 Mobile-first, deployment-ready Streamlit app.
-Deploy on: Streamlit Community Cloud (share.streamlit.io)
 """
 
 import io
@@ -103,7 +102,6 @@ HORIZON_MONTHS = 120
 # ─────────────────────────────────────────────────────────────────────────────
 
 def sip_fv(P: float, annual_pct: float, months: int) -> float:
-    """Future Value of Annuity Due: FV = P x [((1+r)^n - 1) / r] x (1+r)"""
     if P == 0 or months == 0:
         return 0.0
     if annual_pct == 0:
@@ -173,7 +171,7 @@ def fmt(amount: float, short: bool = False) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# CHART HELPERS
+# CHARTS
 # ─────────────────────────────────────────────────────────────────────────────
 
 _BG   = "#0A0E1A"
@@ -193,32 +191,23 @@ def _layout(title: str = "", height: int = 380) -> dict:
                     yanchor="bottom", y=-0.30, xanchor="center", x=0.5),
         margin=dict(l=10, r=10, t=46, b=96),
         height=height,
-        xaxis=dict(gridcolor=_GRID, zeroline=False,
-                   tickfont=dict(size=10), automargin=True),
-        yaxis=dict(gridcolor=_GRID, zeroline=False,
-                   tickfont=dict(size=10), automargin=True),
+        xaxis=dict(gridcolor=_GRID, zeroline=False, tickfont=dict(size=10), automargin=True),
+        yaxis=dict(gridcolor=_GRID, zeroline=False, tickfont=dict(size=10), automargin=True),
         hovermode="x unified",
-        hoverlabel=dict(bgcolor="#0F1629", bordercolor="#1A2340",
-                        font=dict(size=11)),
+        hoverlabel=dict(bgcolor="#0F1629", bordercolor="#1A2340", font=dict(size=11)),
     )
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# CHARTS
-# ─────────────────────────────────────────────────────────────────────────────
-
 def chart_wealth_gap(P: float) -> go.Figure:
-    months  = np.arange(1, HORIZON_MONTHS + 1)
+    months   = np.arange(1, HORIZON_MONTHS + 1)
     invested = invested_series(P, HORIZON_MONTHS)
     fig = go.Figure()
-
     fig.add_trace(go.Scatter(
         x=months, y=invested, name="Total Spent",
         line=dict(color="#546E7A", width=2, dash="dot"),
         fill="tozeroy", fillcolor="rgba(84,110,122,0.07)",
         hovertemplate="Month %{x}<br>Spent: \u20b9%{y:,.0f}<extra></extra>",
     ))
-
     fills = ["tozeroy", "tonexty", "tonexty"]
     for (bm_name, bm), fill in zip(BENCHMARKS.items(), fills):
         s = growth_series(P, bm["rate"], HORIZON_MONTHS)
@@ -228,7 +217,6 @@ def chart_wealth_gap(P: float) -> go.Figure:
             fill=fill, fillcolor=bm["fill"],
             hovertemplate=f"{bm_name} mo%{{x}}: \u20b9%{{y:,.0f}}<extra></extra>",
         ))
-
     for mo, label in [(36, "3Y"), (60, "5Y"), (120, "10Y")]:
         eq_val = growth_series(P, 12.0, HORIZON_MONTHS)[mo - 1]
         fig.add_vline(x=mo, line=dict(color="#1E2D50", width=1, dash="dash"))
@@ -239,7 +227,6 @@ def chart_wealth_gap(P: float) -> go.Figure:
             font=dict(size=9, color="#FFB74D"),
             bgcolor="#0F1629", borderpad=3,
         )
-
     lo = _layout("Wealth Gap — Spend vs SIP Returns (10 Years)", height=420)
     lo["xaxis"]["title"] = "Month"
     lo["yaxis"].update(tickprefix="\u20b9", tickformat=",")
@@ -256,16 +243,12 @@ def chart_bar_comparison(portfolio: list) -> go.Figure:
         ("Debt 8%",     8.0,  "#A5D6A7"),
         ("Equity 12%",  12.0, "#FFB74D"),
     ]:
-        vals = [
-            s["price"] * 120 if rate == 0 else sip_fv(s["price"], rate, 120)
-            for s in portfolio
-        ]
+        vals = [s["price"] * 120 if rate == 0 else sip_fv(s["price"], rate, 120) for s in portfolio]
         fig.add_trace(go.Bar(
             name=cat, x=labels, y=vals,
             marker=dict(color=color, line=dict(width=0)),
             text=[fmt(v, short=True) for v in vals],
-            textposition="outside",
-            textfont=dict(size=9, color="#FFFFFF"),
+            textposition="outside", textfont=dict(size=9, color="#FFFFFF"),
             hovertemplate=f"{cat}: \u20b9%{{y:,.0f}}<extra></extra>",
         ))
     lo = _layout("10-Year Projection Per Subscription", height=420)
@@ -283,7 +266,6 @@ def chart_donut(portfolio: list) -> go.Figure:
     values = list(cat_totals.values())
     colors = [CATEGORY_COLORS.get(l, "#B0BEC5") for l in labels]
     total_mo = sum(values)
-
     fig = go.Figure(go.Pie(
         labels=labels, values=values, hole=0.65,
         marker=dict(colors=colors, line=dict(color="#0A0E1A", width=2)),
@@ -308,7 +290,6 @@ def chart_waterfall(portfolio: list) -> go.Figure:
     names  = [s["display"].split()[0] for s in subs]
     prices = [s["price"] for s in subs]
     total  = sum(prices)
-
     fig = go.Figure(go.Waterfall(
         orientation="v",
         measure=["relative"] * len(subs) + ["total"],
@@ -318,8 +299,7 @@ def chart_waterfall(portfolio: list) -> go.Figure:
         increasing=dict(marker=dict(color="#4FC3F7")),
         totals=dict(marker=dict(color="#FFB74D")),
         text=[f"\u20b9{p:,}" for p in prices] + [f"\u20b9{total:,}"],
-        textposition="outside",
-        textfont=dict(size=9, color="#FFFFFF"),
+        textposition="outside", textfont=dict(size=9, color="#FFFFFF"),
         hovertemplate="%{x}: \u20b9%{y:,.0f}<extra></extra>",
     ))
     lo = _layout("Monthly Burn Breakdown", height=360)
@@ -329,21 +309,18 @@ def chart_waterfall(portfolio: list) -> go.Figure:
 
 
 def chart_break_even(P: float) -> go.Figure:
-    months  = np.arange(1, HORIZON_MONTHS + 1)
+    months   = np.arange(1, HORIZON_MONTHS + 1)
     invested = invested_series(P, HORIZON_MONTHS)
     fig = go.Figure()
-
     fig.add_trace(go.Scatter(
         x=months, y=invested, name="Total Spent",
         line=dict(color="#546E7A", width=2, dash="dot"),
         hovertemplate="Month %{x}: Spent \u20b9%{y:,.0f}<extra></extra>",
     ))
-
     for bm_name, bm in BENCHMARKS.items():
         s = growth_series(P, bm["rate"], HORIZON_MONTHS)
         crossover = next(
-            (i + 1 for i, (sv, iv) in enumerate(zip(s, invested)) if sv >= iv),
-            None,
+            (i + 1 for i, (sv, iv) in enumerate(zip(s, invested)) if sv >= iv), None
         )
         fig.add_trace(go.Scatter(
             x=months, y=s, name=bm_name,
@@ -358,7 +335,6 @@ def chart_break_even(P: float) -> go.Figure:
                 font=dict(size=9, color=bm["color"]),
                 bgcolor="#0F1629", borderpad=2, ax=25, ay=-28,
             )
-
     lo = _layout("Break-Even — When SIP Outpaces Total Spend", height=420)
     lo["yaxis"].update(tickprefix="\u20b9", tickformat=",")
     lo["xaxis"]["title"] = "Month"
@@ -370,7 +346,6 @@ def chart_radar(P: float) -> go.Figure:
     horizons = [12, 36, 60, 120]
     labels   = ["1 Year", "3 Years", "5 Years", "10 Years"]
     fig = go.Figure()
-
     for bm_name, bm in BENCHMARKS.items():
         vals   = [sip_fv(P, bm["rate"], h) for h in horizons]
         vals_c = vals + [vals[0]]
@@ -381,15 +356,12 @@ def chart_radar(P: float) -> go.Figure:
             fill="toself", fillcolor=bm["fill"],
             hovertemplate="%{theta}: \u20b9%{r:,.0f}<extra></extra>",
         ))
-
     fig.update_layout(
         polar=dict(
             bgcolor=_SURF,
-            radialaxis=dict(
-                visible=True, gridcolor=_GRID,
-                tickfont=dict(size=8, color="#6B7A99"),
-                tickprefix="\u20b9", tickformat=",",
-            ),
+            radialaxis=dict(visible=True, gridcolor=_GRID,
+                            tickfont=dict(size=8, color="#6B7A99"),
+                            tickprefix="\u20b9", tickformat=","),
             angularaxis=dict(gridcolor=_GRID, tickfont=dict(size=10)),
         ),
         paper_bgcolor=_BG, font=_FONT,
@@ -409,11 +381,8 @@ def chart_heatmap(portfolio: list) -> go.Figure:
     names = [s["display"] for s in portfolio]
     z     = [[sip_fv(s["price"], 12.0, y * 12) for y in years] for s in portfolio]
     text  = [[fmt(v, short=True) for v in row] for row in z]
-
     fig = go.Figure(go.Heatmap(
-        z=z,
-        x=[f"Yr {y}" for y in years],
-        y=names,
+        z=z, x=[f"Yr {y}" for y in years], y=names,
         text=text, texttemplate="%{text}",
         colorscale=[
             [0.0, "#0F1629"], [0.3, "#0F3460"],
@@ -453,30 +422,22 @@ def generate_excel(portfolio: list) -> bytes:
     f_inr   = F(num_format="\u20b9#,##0", bg_color="#0F1629",
                 font_color="#E8EAF0", border=1, border_color="#1E2D50")
     f_gold  = F(num_format="\u20b9#,##0", bg_color="#0F1629",
-                font_color="#FFB74D", bold=True,
-                border=1, border_color="#1E2D50")
+                font_color="#FFB74D", bold=True, border=1, border_color="#1E2D50")
     f_green = F(num_format="\u20b9#,##0", bg_color="#0F1629",
                 font_color="#A5D6A7", border=1, border_color="#1E2D50")
     f_red   = F(num_format="\u20b9#,##0", bg_color="#0F1629",
-                font_color="#EF9A9A", bold=True,
-                border=1, border_color="#1E2D50")
-    f_mo    = F(num_format="0", bg_color="#0F1629",
-                font_color="#6B7A99", border=1, border_color="#1E2D50",
-                align="center")
-    f_tot   = F(bold=True, font_size=11, font_color="#FFB74D",
-                bg_color="#141C35",
-                border=2, border_color="#4FC3F7",
-                num_format="\u20b9#,##0")
-    f_tlbl  = F(bold=True, font_size=11, font_color="#4FC3F7",
-                bg_color="#141C35",
+                font_color="#EF9A9A", bold=True, border=1, border_color="#1E2D50")
+    f_mo    = F(num_format="0", bg_color="#0F1629", font_color="#6B7A99",
+                border=1, border_color="#1E2D50", align="center")
+    f_tot   = F(bold=True, font_size=11, font_color="#FFB74D", bg_color="#141C35",
+                border=2, border_color="#4FC3F7", num_format="\u20b9#,##0")
+    f_tlbl  = F(bold=True, font_size=11, font_color="#4FC3F7", bg_color="#141C35",
                 border=2, border_color="#4FC3F7")
 
-    # Sheet 1 — Summary
     ws = wb.add_worksheet("Opportunity Cost Summary")
     ws.set_tab_color("#4FC3F7")
     ws.hide_gridlines(2)
-    ws.merge_range("A1:P1",
-                   "  Subscription Opportunity Cost — India Edition", f_title)
+    ws.merge_range("A1:P1", "  Subscription Opportunity Cost — India Edition", f_title)
     ws.set_row(0, 28)
 
     headers = [
@@ -505,13 +466,12 @@ def generate_excel(portfolio: list) -> bytes:
                 col += 1
         ws.write(dr, col, sip_fv(P, 12.0, 120) - P * 120, f_red)
 
-    # Totals row
     tr = len(portfolio) + 2
     ws.set_row(tr, 26)
     tm = sum(s["price"] for s in portfolio)
-    ws.write(tr, 0, "PORTFOLIO TOTAL",            f_tlbl)
-    ws.write(tr, 1, f"{len(portfolio)} items",    f_tlbl)
-    ws.write(tr, 2, tm,                            f_tot)
+    ws.write(tr, 0, "PORTFOLIO TOTAL",         f_tlbl)
+    ws.write(tr, 1, f"{len(portfolio)} items", f_tlbl)
+    ws.write(tr, 2, tm,                         f_tot)
     col = 3
     for n in [12, 36, 60, 120]:
         for rate in [6.0, 8.0, 12.0]:
@@ -520,15 +480,12 @@ def generate_excel(portfolio: list) -> bytes:
     ws.write(tr, col, sip_fv(tm, 12.0, 120) - tm * 120, f_tot)
     ws.freeze_panes(2, 3)
 
-    # Sheet 2 — Monthly Detail
     ws2 = wb.add_worksheet("Monthly Growth Detail")
     ws2.set_tab_color("#FFB74D")
     ws2.hide_gridlines(2)
-    ws2.merge_range(
-        "A1:F1",
-        f"  Portfolio Monthly SIP Growth — \u20b9{tm:,}/month combined",
-        f_title,
-    )
+    ws2.merge_range("A1:F1",
+                    f"  Portfolio Monthly SIP Growth — \u20b9{tm:,}/month combined",
+                    f_title)
     ws2.set_row(0, 28)
     dh = ["Month", "Total Invested", "FD 6%", "Debt 8%", "Equity 12%", "Wealth Gap"]
     dw = [10, 17, 16, 16, 18, 17]
@@ -539,12 +496,12 @@ def generate_excel(portfolio: list) -> bytes:
     for mo in range(1, HORIZON_MONTHS + 1):
         r, inv = mo + 1, tm * mo
         eq = sip_fv(tm, 12.0, mo)
-        ws2.write(r, 0, mo,                    f_mo)
-        ws2.write(r, 1, inv,                   f_inr)
-        ws2.write(r, 2, sip_fv(tm, 6.0, mo),  f_green)
-        ws2.write(r, 3, sip_fv(tm, 8.0, mo),  f_inr)
-        ws2.write(r, 4, eq,                    f_gold)
-        ws2.write(r, 5, eq - inv,              f_red)
+        ws2.write(r, 0, mo,                   f_mo)
+        ws2.write(r, 1, inv,                  f_inr)
+        ws2.write(r, 2, sip_fv(tm, 6.0, mo), f_green)
+        ws2.write(r, 3, sip_fv(tm, 8.0, mo), f_inr)
+        ws2.write(r, 4, eq,                   f_gold)
+        ws2.write(r, 5, eq - inv,             f_red)
     ws2.freeze_panes(2, 1)
 
     wr.close()
@@ -566,14 +523,11 @@ html, body, [class*="css"] {
 .stApp { background: #0A0E1A !important; }
 .block-container { padding: 0 1rem 3rem !important; max-width: 1200px !important; }
 
-/* Sidebar */
 section[data-testid="stSidebar"] > div {
     background: #0D1120 !important;
     border-right: 1px solid #1A2340 !important;
 }
-section[data-testid="stSidebar"] { min-width: 260px !important; }
 
-/* Inputs */
 .stTextInput > div > div > input,
 .stNumberInput > div > div > input {
     background: #141C35 !important;
@@ -589,7 +543,6 @@ section[data-testid="stSidebar"] { min-width: 260px !important; }
 }
 input::placeholder { color: #4A5568 !important; }
 
-/* Buttons */
 .stButton > button {
     background: #141C35 !important;
     color: #E8EAF0 !important;
@@ -606,7 +559,6 @@ input::placeholder { color: #4A5568 !important; }
     color: #4FC3F7 !important;
 }
 
-/* Tabs */
 .stTabs [data-baseweb="tab-list"] {
     background: #0D1120;
     border-radius: 10px;
@@ -626,20 +578,10 @@ input::placeholder { color: #4A5568 !important; }
     color: #4FC3F7 !important;
 }
 
-/* DataFrame */
 .stDataFrame { border-radius: 10px !important; }
-[data-testid="stDataFrame"] thead tr th {
-    background: #141C35 !important;
-    color: #6B7A99 !important;
-    font-size: 11px !important;
-    text-transform: uppercase !important;
-    letter-spacing: .05em !important;
-}
-[data-testid="stDataFrame"] tbody tr td { font-size: 12px !important; }
-
-/* Misc */
 hr { border-color: #1A2340 !important; margin: 14px 0 !important; }
 .stAlert { border-radius: 8px !important; font-size: 13px !important; }
+
 .stDownloadButton > button {
     background: linear-gradient(135deg, #0F3460, #1565C0) !important;
     color: #FFFFFF !important;
@@ -649,68 +591,64 @@ hr { border-color: #1A2340 !important; margin: 14px 0 !important; }
 }
 .stDownloadButton > button:hover { opacity: 0.88 !important; }
 
-/* Mobile */
-@media (max-width: 640px) {
-    .block-container { padding: 0 0.4rem 2rem !important; }
-    .stTabs [data-baseweb="tab"] { font-size: 10px !important; padding: 5px 7px !important; }
-    [data-testid="stDataFrame"] tbody tr td { font-size: 11px !important; }
-}
-
-/* Hide Streamlit branding — target only the badge/toolbar, not the header wrapper */
+/* Hide Streamlit branding — keep sidebar toggle visible */
 #MainMenu { visibility: hidden !important; }
 footer { visibility: hidden !important; }
 [data-testid="stToolbar"] { visibility: hidden !important; }
 [data-testid="stDecoration"] { display: none !important; }
 [data-testid="stStatusWidget"] { visibility: hidden !important; }
+
+@media (max-width: 640px) {
+    .block-container { padding: 0 0.4rem 2rem !important; }
+    .stTabs [data-baseweb="tab"] { font-size: 10px !important; padding: 5px 7px !important; }
+}
 </style>
 """
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# UI COMPONENTS
+# UI HELPERS
 # ─────────────────────────────────────────────────────────────────────────────
 
-def kpi(label: str, value: str, sub: str = "", icon: str = "",
-        accent: str = "#FFFFFF", sub_color: str = "#A5D6A7"):
+def kpi(label, value, sub="", icon="", accent="#FFFFFF", sub_color="#A5D6A7"):
     sub_html = (
-        f"<div style='font-size:11px;color:{sub_color};margin-top:3px;"
-        f"font-weight:500;white-space:nowrap;overflow:hidden;"
-        f"text-overflow:ellipsis;'>{sub}</div>"
+        f"<div style='font-size:11px;color:{sub_color};margin-top:3px;font-weight:500;"
+        f"white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>{sub}</div>"
         if sub else ""
     )
-    st.markdown(f"""
-    <div style="background:linear-gradient(145deg,#141C35,#0F1629);
-                border:1px solid #1E2D50;border-radius:12px;
-                padding:14px 10px;text-align:center;">
-        <div style="font-size:18px;margin-bottom:2px;">{icon}</div>
-        <div style="font-size:10px;color:#6B7A99;text-transform:uppercase;
-                    letter-spacing:.09em;margin-bottom:4px;">{label}</div>
-        <div style="font-size:17px;font-weight:700;color:{accent};
-                    line-height:1.2;word-break:break-word;">{value}</div>
-        {sub_html}
-    </div>""", unsafe_allow_html=True)
+    st.markdown(
+        f"<div style='background:linear-gradient(145deg,#141C35,#0F1629);"
+        f"border:1px solid #1E2D50;border-radius:12px;padding:14px 10px;text-align:center;'>"
+        f"<div style='font-size:18px;margin-bottom:2px;'>{icon}</div>"
+        f"<div style='font-size:10px;color:#6B7A99;text-transform:uppercase;"
+        f"letter-spacing:.09em;margin-bottom:4px;'>{label}</div>"
+        f"<div style='font-size:17px;font-weight:700;color:{accent};"
+        f"line-height:1.2;word-break:break-word;'>{value}</div>"
+        f"{sub_html}</div>",
+        unsafe_allow_html=True,
+    )
 
 
-def infobox(html: str, color: str = "#4FC3F7"):
-    st.markdown(f"""
-    <div style="background:#0D1120;border-left:3px solid {color};
-                border-radius:0 8px 8px 0;padding:10px 14px;
-                font-size:12px;color:#B0BEC5;line-height:1.5;margin:4px 0 10px;">
-        {html}
-    </div>""", unsafe_allow_html=True)
+def infobox(html, color="#4FC3F7"):
+    st.markdown(
+        f"<div style='background:#0D1120;border-left:3px solid {color};"
+        f"border-radius:0 8px 8px 0;padding:10px 14px;"
+        f"font-size:12px;color:#B0BEC5;line-height:1.5;margin:4px 0 10px;'>{html}</div>",
+        unsafe_allow_html=True,
+    )
 
 
-def section(title: str, subtitle: str = ""):
+def section(title, subtitle=""):
     sub = f"<p style='color:#6B7A99;font-size:12px;margin:2px 0 0;'>{subtitle}</p>" if subtitle else ""
-    st.markdown(f"""
-    <div style="margin:22px 0 10px;">
-        <h2 style="color:#FFFFFF;font-size:1.05rem;font-weight:700;
-                   margin:0;letter-spacing:-.01em;">{title}</h2>
-        {sub}
-    </div>""", unsafe_allow_html=True)
+    st.markdown(
+        f"<div style='margin:22px 0 10px;'>"
+        f"<h2 style='color:#FFFFFF;font-size:1.05rem;font-weight:700;margin:0;"
+        f"letter-spacing:-.01em;'>{title}</h2>{sub}</div>",
+        unsafe_allow_html=True,
+    )
 
 
-def totals_strip(portfolio: list):
+def totals_strip(portfolio):
     tm      = sum(s["price"] for s in portfolio)
     spent   = tm * 120
     fd_val  = sip_fv(tm, 6.0,  120)
@@ -719,61 +657,40 @@ def totals_strip(portfolio: list):
     gap     = eq_val - spent
     daily   = tm / 30
 
-    st.markdown(f"""
-    <div style="background:linear-gradient(135deg,#0F1629,#141C35,#0A1628);
-                border:1px solid #1E2D50;border-radius:14px;
-                padding:18px 20px;margin:4px 0 14px;overflow-x:auto;">
-        <div style="font-size:10px;color:#6B7A99;text-transform:uppercase;
-                    letter-spacing:.1em;margin-bottom:12px;">
-            Portfolio Total &nbsp;·&nbsp; {len(portfolio)} subscription{'s' if len(portfolio)!=1 else ''}
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:16px 28px;align-items:flex-end;">
-            <div>
-                <div style="font-size:11px;color:#6B7A99;margin-bottom:1px;">Monthly Burn</div>
-                <div style="font-size:clamp(1.5rem,5vw,2.4rem);font-weight:800;
-                            color:#FFFFFF;line-height:1;">{fmt(tm)}</div>
-                <div style="font-size:11px;color:#6B7A99;margin-top:2px;">
-                    {fmt(daily,short=True)}/day &nbsp;·&nbsp; {fmt(tm*12,short=True)}/yr
-                </div>
-            </div>
-            <div style="width:1px;background:#1E2D50;height:50px;flex-shrink:0;"></div>
-            <div>
-                <div style="font-size:11px;color:#6B7A99;margin-bottom:1px;">10Y Spent</div>
-                <div style="font-size:clamp(1.1rem,3.5vw,1.6rem);font-weight:700;
-                            color:#EF9A9A;line-height:1;">{fmt(spent)}</div>
-                <div style="font-size:10px;color:#6B7A99;">if never invested</div>
-            </div>
-            <div style="width:1px;background:#1E2D50;height:50px;flex-shrink:0;"></div>
-            <div>
-                <div style="font-size:11px;color:#4FC3F7;margin-bottom:1px;">FD @ 6%</div>
-                <div style="font-size:clamp(1.1rem,3.5vw,1.6rem);font-weight:700;
-                            color:#4FC3F7;line-height:1;">{fmt(fd_val)}</div>
-                <div style="font-size:10px;color:#4FC3F7;">+{fmt(fd_val-spent,short=True)}</div>
-            </div>
-            <div style="width:1px;background:#1E2D50;height:50px;flex-shrink:0;"></div>
-            <div>
-                <div style="font-size:11px;color:#A5D6A7;margin-bottom:1px;">Debt @ 8%</div>
-                <div style="font-size:clamp(1.1rem,3.5vw,1.6rem);font-weight:700;
-                            color:#A5D6A7;line-height:1;">{fmt(dbt_val)}</div>
-                <div style="font-size:10px;color:#A5D6A7;">+{fmt(dbt_val-spent,short=True)}</div>
-            </div>
-            <div style="width:1px;background:#1E2D50;height:50px;flex-shrink:0;"></div>
-            <div>
-                <div style="font-size:11px;color:#FFB74D;margin-bottom:1px;">Equity SIP @ 12%</div>
-                <div style="font-size:clamp(1.3rem,4vw,2rem);font-weight:800;
-                            color:#FFB74D;line-height:1;">{fmt(eq_val)}</div>
-                <div style="font-size:10px;color:#FFB74D;font-weight:600;">
-                    +{fmt(gap,short=True)} wealth created
-                </div>
-            </div>
-        </div>
-    </div>""", unsafe_allow_html=True)
+    st.markdown(
+        f"<div style='background:linear-gradient(135deg,#0F1629,#141C35,#0A1628);"
+        f"border:1px solid #1E2D50;border-radius:14px;padding:18px 20px;margin:4px 0 14px;overflow-x:auto;'>"
+        f"<div style='font-size:10px;color:#6B7A99;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;'>"
+        f"Portfolio Total &nbsp;&middot;&nbsp; {len(portfolio)} subscription{'s' if len(portfolio)!=1 else ''}"
+        f"</div>"
+        f"<div style='display:flex;flex-wrap:wrap;gap:16px 28px;align-items:flex-end;'>"
+        f"<div><div style='font-size:11px;color:#6B7A99;margin-bottom:1px;'>Monthly Burn</div>"
+        f"<div style='font-size:clamp(1.5rem,5vw,2.4rem);font-weight:800;color:#FFFFFF;line-height:1;'>{fmt(tm)}</div>"
+        f"<div style='font-size:11px;color:#6B7A99;margin-top:2px;'>{fmt(daily,short=True)}/day &nbsp;&middot;&nbsp; {fmt(tm*12,short=True)}/yr</div></div>"
+        f"<div style='width:1px;background:#1E2D50;height:50px;flex-shrink:0;'></div>"
+        f"<div><div style='font-size:11px;color:#6B7A99;margin-bottom:1px;'>10Y Spent</div>"
+        f"<div style='font-size:clamp(1.1rem,3.5vw,1.6rem);font-weight:700;color:#EF9A9A;line-height:1;'>{fmt(spent)}</div>"
+        f"<div style='font-size:10px;color:#6B7A99;'>if never invested</div></div>"
+        f"<div style='width:1px;background:#1E2D50;height:50px;flex-shrink:0;'></div>"
+        f"<div><div style='font-size:11px;color:#4FC3F7;margin-bottom:1px;'>FD @ 6%</div>"
+        f"<div style='font-size:clamp(1.1rem,3.5vw,1.6rem);font-weight:700;color:#4FC3F7;line-height:1;'>{fmt(fd_val)}</div>"
+        f"<div style='font-size:10px;color:#4FC3F7;'>+{fmt(fd_val-spent,short=True)}</div></div>"
+        f"<div style='width:1px;background:#1E2D50;height:50px;flex-shrink:0;'></div>"
+        f"<div><div style='font-size:11px;color:#A5D6A7;margin-bottom:1px;'>Debt @ 8%</div>"
+        f"<div style='font-size:clamp(1.1rem,3.5vw,1.6rem);font-weight:700;color:#A5D6A7;line-height:1;'>{fmt(dbt_val)}</div>"
+        f"<div style='font-size:10px;color:#A5D6A7;'>+{fmt(dbt_val-spent,short=True)}</div></div>"
+        f"<div style='width:1px;background:#1E2D50;height:50px;flex-shrink:0;'></div>"
+        f"<div><div style='font-size:11px;color:#FFB74D;margin-bottom:1px;'>Equity SIP @ 12%</div>"
+        f"<div style='font-size:clamp(1.3rem,4vw,2rem);font-weight:800;color:#FFB74D;line-height:1;'>{fmt(eq_val)}</div>"
+        f"<div style='font-size:10px;color:#FFB74D;font-weight:600;'>+{fmt(gap,short=True)} wealth created</div></div>"
+        f"</div></div>",
+        unsafe_allow_html=True,
+    )
 
-    # KPI row
     cols = st.columns(6)
     with cols[0]: kpi("Subs", str(len(portfolio)), icon="📱", accent="#4FC3F7")
-    with cols[1]: kpi("Daily", fmt(daily,short=True), icon="📅", accent="#B0BEC5", sub_color="#6B7A99")
-    with cols[2]: kpi("Annual", fmt(tm*12,short=True), icon="🔥", accent="#EF9A9A", sub_color="#EF9A9A")
+    with cols[1]: kpi("Daily", fmt(daily, short=True), icon="📅", accent="#B0BEC5", sub_color="#6B7A99")
+    with cols[2]: kpi("Annual", fmt(tm*12, short=True), icon="🔥", accent="#EF9A9A", sub_color="#EF9A9A")
     with cols[3]:
         roi_fd = (fd_val / spent - 1) * 100 if spent else 0
         kpi("FD ROI", f"{roi_fd:.1f}%", f"+{fmt(fd_val-spent,short=True)}", "🏦", "#4FC3F7")
@@ -782,7 +699,7 @@ def totals_strip(portfolio: list):
         kpi("Equity ROI", f"{roi_eq:.1f}%", f"+{fmt(gap,short=True)}", "🚀", "#FFB74D")
     with cols[5]:
         biggest = max(portfolio, key=lambda s: s["price"])
-        kpi("Top Spend", fmt(biggest["price"],short=True),
+        kpi("Top Spend", fmt(biggest["price"], short=True),
             biggest["display"].split()[0], "👑", "#F06292", "#F06292")
 
 
@@ -795,12 +712,12 @@ def main():
         page_title="Subscription Opportunity Cost — India",
         page_icon="📊",
         layout="wide",
-        initial_sidebar_state="collapsed",
+        initial_sidebar_state="expanded",
         menu_items={
             "About": (
                 "**Subscription Opportunity Cost Calculator — India Edition**\n\n"
-                "Visualize the true wealth cost of your monthly subscriptions "
-                "vs SIP returns in FD, Debt & Equity funds.\n\n"
+                "Visualize the true wealth cost of monthly subscriptions "
+                "vs SIP returns in FD, Debt & Equity.\n\n"
                 "Built with Streamlit · Inspired by Sandeep Jethwani"
             )
         },
@@ -809,49 +726,43 @@ def main():
     st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
 
     # Hero header
-    st.markdown("""
-    <div style="background:linear-gradient(135deg,#0F1629 0%,#0A0E1A 100%);
-                border-bottom:1px solid #1A2340;
-                padding:18px 20px 14px;margin:-1px -1rem 0;">
-        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <div style="font-size:26px;">📊</div>
-            <div style="flex:1;min-width:180px;">
-                <h1 style="color:#FFFFFF;margin:0;
-                           font-size:clamp(1.15rem,4vw,1.7rem);
-                           font-weight:800;letter-spacing:-.02em;line-height:1.15;">
-                    Subscription Opportunity Cost
-                </h1>
-                <p style="color:#6B7A99;margin:3px 0 0;font-size:12px;">
-                    India Edition &nbsp;·&nbsp; SIP vs Subscriptions
-                </p>
-            </div>
-            <span style="background:#141C35;border:1px solid #1E2D50;
-                         border-radius:20px;padding:4px 12px;font-size:10px;
-                         color:#4FC3F7;font-weight:600;letter-spacing:.06em;
-                         white-space:nowrap;">
-                FD 6% · Debt 8% · Equity 12%
-            </span>
-        </div>
-    </div>
-    <div style="height:10px;"></div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        "<div style='background:linear-gradient(135deg,#0F1629 0%,#0A0E1A 100%);"
+        "border-bottom:1px solid #1A2340;padding:18px 20px 14px;margin:-1px -1rem 0;'>"
+        "<div style='display:flex;align-items:center;gap:12px;flex-wrap:wrap;'>"
+        "<div style='font-size:26px;'>📊</div>"
+        "<div style='flex:1;min-width:180px;'>"
+        "<h1 style='color:#FFFFFF;margin:0;font-size:clamp(1.15rem,4vw,1.7rem);"
+        "font-weight:800;letter-spacing:-.02em;line-height:1.15;'>"
+        "Subscription Opportunity Cost</h1>"
+        "<p style='color:#6B7A99;margin:3px 0 0;font-size:12px;'>"
+        "India Edition &nbsp;&middot;&nbsp; What your subscriptions could build as SIPs"
+        "</p></div>"
+        "<span style='background:#141C35;border:1px solid #1E2D50;border-radius:20px;"
+        "padding:4px 12px;font-size:10px;color:#4FC3F7;font-weight:600;"
+        "letter-spacing:.06em;white-space:nowrap;'>FD 6% &middot; Debt 8% &middot; Equity 12%</span>"
+        "</div></div>"
+        "<div style='height:10px;'></div>",
+        unsafe_allow_html=True,
+    )
 
-    # Session state
     if "portfolio" not in st.session_state:
         st.session_state.portfolio = []
 
     # ── SIDEBAR ───────────────────────────────────────────────────────────────
     with st.sidebar:
-        st.markdown("""
-        <div style="font-size:13px;font-weight:700;color:#E8EAF0;
-                    padding:4px 0 10px;border-bottom:1px solid #1A2340;
-                    margin-bottom:10px;">
-            ➕ Add Subscription
-        </div>""", unsafe_allow_html=True)
+        st.markdown(
+            "<div style='font-size:14px;font-weight:700;color:#E8EAF0;"
+            "padding:4px 0 10px;border-bottom:1px solid #1A2340;margin-bottom:10px;'>"
+            "➕ Add Subscription</div>",
+            unsafe_allow_html=True,
+        )
 
         search_name = st.text_input(
-            "App name", placeholder="e.g. Netflix, Spotify…",
-            label_visibility="collapsed", key="search_input",
+            "App name",
+            placeholder="e.g. Netflix, Spotify, Swiggy…",
+            label_visibility="collapsed",
+            key="search_input",
         )
 
         found_data, found_source, manual_price = None, "", None
@@ -859,28 +770,28 @@ def main():
         if search_name.strip():
             found_data, found_source = resolve_price(search_name.strip())
             if found_data:
-                st.markdown(f"""
-                <div style="background:#0A1A10;border-left:3px solid #A5D6A7;
-                            border-radius:0 8px 8px 0;padding:8px 10px;
-                            margin:6px 0;font-size:11px;color:#E8EAF0;">
-                    <b style='color:#A5D6A7;'>Found:</b> {found_data['display']}<br>
-                    <span style='color:#6B7A99;'>{found_data['category']} · {found_source}</span>
-                </div>""", unsafe_allow_html=True)
+                st.markdown(
+                    f"<div style='background:#0A1A10;border-left:3px solid #A5D6A7;"
+                    f"border-radius:0 8px 8px 0;padding:8px 10px;margin:6px 0;"
+                    f"font-size:11px;color:#E8EAF0;'>"
+                    f"<b style='color:#A5D6A7;'>Found:</b> {found_data['display']}<br>"
+                    f"<span style='color:#6B7A99;'>{found_data['category']} &middot; {found_source}</span>"
+                    f"</div>",
+                    unsafe_allow_html=True,
+                )
                 manual_price = st.number_input(
-                    "Monthly price (INR)",
-                    min_value=1, max_value=50000,
+                    "Monthly price (INR)", min_value=1, max_value=50000,
                     value=found_data["price"], step=10, key="price_adj",
                 )
             else:
-                st.markdown("""
-                <div style="background:#1A1000;border-left:3px solid #FFB74D;
-                            border-radius:0 8px 8px 0;padding:8px 10px;
-                            margin:6px 0;font-size:11px;color:#B0BEC5;">
-                    Not found — enter price manually
-                </div>""", unsafe_allow_html=True)
+                st.markdown(
+                    "<div style='background:#1A1000;border-left:3px solid #FFB74D;"
+                    "border-radius:0 8px 8px 0;padding:8px 10px;margin:6px 0;"
+                    "font-size:11px;color:#B0BEC5;'>Not found — enter price manually</div>",
+                    unsafe_allow_html=True,
+                )
                 manual_price = st.number_input(
-                    "Monthly price (INR)",
-                    min_value=1, max_value=50000,
+                    "Monthly price (INR)", min_value=1, max_value=50000,
                     value=299, step=10, key="price_manual",
                 )
 
@@ -888,8 +799,8 @@ def main():
             name_clean = search_name.strip()
             if name_clean and manual_price and int(manual_price) > 0:
                 entry = {
-                    "display":  found_data["display"]      if found_data else name_clean.title(),
-                    "category": found_data["category"]     if found_data else "Other",
+                    "display":  found_data["display"]       if found_data else name_clean.title(),
+                    "category": found_data["category"]      if found_data else "Other",
                     "emoji":    found_data.get("emoji","📱") if found_data else "📱",
                     "price":    int(manual_price),
                 }
@@ -902,16 +813,17 @@ def main():
             else:
                 st.error("Enter an app name and price.")
 
-        st.markdown("""
-        <div style="font-size:10px;font-weight:600;color:#6B7A99;text-transform:uppercase;
-                    letter-spacing:.08em;margin:12px 0 7px;border-top:1px solid #1A2340;
-                    padding-top:12px;">Quick Add</div>""", unsafe_allow_html=True)
+        st.markdown(
+            "<div style='font-size:10px;font-weight:600;color:#6B7A99;text-transform:uppercase;"
+            "letter-spacing:.08em;margin:12px 0 7px;border-top:1px solid #1A2340;"
+            "padding-top:12px;'>Quick Add</div>",
+            unsafe_allow_html=True,
+        )
 
         qcols = st.columns(2)
         for i, (app, emoji, _price) in enumerate(QUICK_APPS):
             with qcols[i % 2]:
-                short = app.split()[0]
-                if st.button(f"{emoji} {short}", key=f"qa_{app}"):
+                if st.button(f"{emoji} {app.split()[0]}", key=f"qa_{app}"):
                     data, _src = resolve_price(app)
                     if data:
                         existing = [s["display"] for s in st.session_state.portfolio]
@@ -919,217 +831,163 @@ def main():
                             st.session_state.portfolio.append({**data})
                             st.rerun()
 
-        # Portfolio list in sidebar
-        portfolio_sb = st.session_state.portfolio
-        st.markdown(f"""
-        <div style="font-size:10px;font-weight:600;color:#6B7A99;text-transform:uppercase;
-                    letter-spacing:.08em;margin:12px 0 7px;border-top:1px solid #1A2340;
-                    padding-top:12px;">
-            Your Portfolio ({len(portfolio_sb)})
-        </div>""", unsafe_allow_html=True)
+        st.markdown(
+            f"<div style='font-size:10px;font-weight:600;color:#6B7A99;text-transform:uppercase;"
+            f"letter-spacing:.08em;margin:12px 0 7px;border-top:1px solid #1A2340;"
+            f"padding-top:12px;'>Your Portfolio ({len(st.session_state.portfolio)})</div>",
+            unsafe_allow_html=True,
+        )
 
+        portfolio_sb = st.session_state.portfolio
         if portfolio_sb:
             total_mo_sb = sum(s["price"] for s in portfolio_sb)
             for i, sub in enumerate(portfolio_sb):
                 pct = sub["price"] / total_mo_sb * 100
                 c1, c2 = st.columns([5, 1])
-                c1.markdown(f"""
-                <div style="font-size:11px;padding:3px 0;">
-                    <span style="color:#E8EAF0;font-weight:600;">
-                        {sub.get('emoji','📱')} {sub['display']}
-                    </span><br>
-                    <span style="color:#6B7A99;">
-                        {fmt(sub['price'])}/mo &nbsp;·&nbsp; {pct:.0f}%
-                    </span>
-                </div>""", unsafe_allow_html=True)
+                c1.markdown(
+                    f"<div style='font-size:11px;padding:3px 0;'>"
+                    f"<span style='color:#E8EAF0;font-weight:600;'>"
+                    f"{sub.get('emoji','📱')} {sub['display']}</span><br>"
+                    f"<span style='color:#6B7A99;'>{fmt(sub['price'])}/mo &nbsp;&middot;&nbsp; {pct:.0f}%</span>"
+                    f"</div>",
+                    unsafe_allow_html=True,
+                )
                 if c2.button("✕", key=f"rm_{i}", help="Remove"):
                     st.session_state.portfolio.pop(i)
                     st.rerun()
 
-            st.markdown(f"""
-            <div style="background:#141C35;border-radius:8px;padding:10px;
-                        text-align:center;margin-top:8px;">
-                <span style="color:#6B7A99;font-size:10px;">Total Monthly</span><br>
-                <span style="color:#FFB74D;font-size:1.3rem;font-weight:800;">
-                    {fmt(total_mo_sb)}
-                </span>
-            </div>""", unsafe_allow_html=True)
-
+            st.markdown(
+                f"<div style='background:#141C35;border-radius:8px;padding:10px;"
+                f"text-align:center;margin-top:8px;'>"
+                f"<span style='color:#6B7A99;font-size:10px;'>Total Monthly</span><br>"
+                f"<span style='color:#FFB74D;font-size:1.3rem;font-weight:800;'>{fmt(total_mo_sb)}</span>"
+                f"</div>",
+                unsafe_allow_html=True,
+            )
             if st.button("Clear All", key="clear_all"):
                 st.session_state.portfolio = []
                 st.rerun()
         else:
-            st.markdown("""
-            <div style="color:#4A5568;font-size:11px;text-align:center;padding:12px 6px;">
-                No subscriptions yet.<br>Use Quick Add above!
-            </div>""", unsafe_allow_html=True)
+            st.markdown(
+                "<div style='color:#4A5568;font-size:11px;text-align:center;padding:12px 6px;'>"
+                "No subscriptions yet.<br>Use Quick Add above!</div>",
+                unsafe_allow_html=True,
+            )
 
-        st.markdown("""
-        <div style="font-size:10px;font-weight:600;color:#6B7A99;text-transform:uppercase;
-                    letter-spacing:.08em;margin:12px 0 6px;border-top:1px solid #1A2340;
-                    padding-top:12px;">Benchmarks</div>""", unsafe_allow_html=True)
+        st.markdown(
+            "<div style='font-size:10px;font-weight:600;color:#6B7A99;text-transform:uppercase;"
+            "letter-spacing:.08em;margin:12px 0 6px;border-top:1px solid #1A2340;"
+            "padding-top:12px;'>Benchmarks</div>",
+            unsafe_allow_html=True,
+        )
         for bm_name, bm in BENCHMARKS.items():
             st.markdown(
                 f"<div style='font-size:11px;color:{bm['color']};padding:2px 0;'>"
                 f"{bm['icon']} {bm_name}</div>",
                 unsafe_allow_html=True,
             )
-        st.markdown("""
-        <div style="font-size:9px;color:#4A5568;margin-top:8px;line-height:1.5;">
-            FV = P x [((1+r)^n - 1)/r] x (1+r)<br>
-            Monthly compounding. Educational use only.
-        </div>""", unsafe_allow_html=True)
+        st.markdown(
+            "<div style='font-size:9px;color:#4A5568;margin-top:8px;line-height:1.5;'>"
+            "FV = P x [((1+r)^n - 1)/r] x (1+r)<br>"
+            "Monthly compounding. Educational use only.</div>",
+            unsafe_allow_html=True,
+        )
 
     # ── MAIN CONTENT ──────────────────────────────────────────────────────────
     portfolio = st.session_state.portfolio
 
-    # Empty state with interactive grid
     if not portfolio:
-        st.markdown("""
-        <div style="text-align:center;padding:36px 16px 18px;">
-            <div style="font-size:52px;margin-bottom:10px;">💸</div>
-            <h2 style="color:#FFFFFF;font-weight:700;font-size:1.2rem;margin:0 0 6px;">
-                Find out what your subscriptions truly cost
-            </h2>
-            <p style="color:#6B7A99;font-size:13px;max-width:400px;margin:0 auto;">
-                Tap any card below — or open the sidebar to search any app by name.
-            </p>
-        </div>""", unsafe_allow_html=True)
-
-        st.markdown("""
-        <div style="font-size:11px;font-weight:600;color:#6B7A99;text-transform:uppercase;
-                    letter-spacing:.08em;text-align:center;margin-bottom:10px;">
-            Popular in India — tap to add
-        </div>""", unsafe_allow_html=True)
-
+        st.markdown(
+            "<div style='text-align:center;padding:36px 16px 18px;'>"
+            "<div style='font-size:52px;margin-bottom:10px;'>💸</div>"
+            "<h2 style='color:#FFFFFF;font-weight:700;font-size:1.2rem;margin:0 0 6px;'>"
+            "Find out what your subscriptions truly cost</h2>"
+            "<p style='color:#6B7A99;font-size:13px;max-width:400px;margin:0 auto;'>"
+            "Search for an app in the sidebar or tap any card below to start.</p></div>",
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            "<div style='font-size:11px;font-weight:600;color:#6B7A99;text-transform:uppercase;"
+            "letter-spacing:.08em;text-align:center;margin-bottom:10px;'>Popular in India</div>",
+            unsafe_allow_html=True,
+        )
         gc = st.columns(2)
         for i, (app, emoji, price) in enumerate(QUICK_APPS):
             with gc[i % 2]:
-                if st.button(
-                    f"{emoji}  {app}  —  \u20b9{price}/mo",
-                    key=f"start_{app}",
-                    use_container_width=True,
-                ):
+                if st.button(f"{emoji}  {app}  —  \u20b9{price}/mo", key=f"start_{app}", use_container_width=True):
                     data, _src = resolve_price(app)
                     if data:
                         existing = [s["display"] for s in st.session_state.portfolio]
                         if data["display"] not in existing:
                             st.session_state.portfolio.append({**data})
                             st.rerun()
-
-        st.markdown("""
-        <div style="text-align:center;margin-top:14px;">
-            <p style="color:#4A5568;font-size:11px;">
-                Tip: open the <b style="color:#6B7A99;">sidebar (top-left arrow)</b>
-                to search any app and set a custom price
-            </p>
-        </div>""", unsafe_allow_html=True)
         return
 
     total_monthly = sum(s["price"] for s in portfolio)
 
-    # Totals strip
     totals_strip(portfolio)
 
-    # Wealth gap alert
     eq_10y  = sip_fv(total_monthly, 12.0, 120)
     gap     = eq_10y - total_monthly * 120
     coffees = max(1, int(total_monthly / 30 / 25))
 
-    st.markdown(f"""
-    <div style="background:linear-gradient(135deg,#1A0808,#240E0E);
-                border:1px solid #5C1A1A;border-left:4px solid #EF5350;
-                border-radius:12px;padding:14px 18px;margin:4px 0 8px;
-                display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">
-        <div style="font-size:28px;flex-shrink:0;">🔥</div>
-        <div style="flex:1;min-width:180px;">
-            <div style="font-size:10px;font-weight:700;color:#EF9A9A;
-                        text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">
-                Wealth Opportunity Cost
-            </div>
-            <div style="font-size:clamp(1rem,3.5vw,1.4rem);font-weight:800;
-                        color:#FF5252;margin-bottom:4px;">
-                {fmt(gap)} missed over 10 years
-            </div>
-            <div style="font-size:12px;color:#B0BEC5;line-height:1.5;">
-                Spending <b style="color:#EF9A9A;">{fmt(total_monthly)}/month</b> on subscriptions
-                instead of an Equity SIP costs you <b style="color:#FF5252;">{fmt(gap)}</b>
-                in potential wealth — equal to {coffees} cups of chai ☕ every day!
-            </div>
-        </div>
-    </div>""", unsafe_allow_html=True)
+    st.markdown(
+        f"<div style='background:linear-gradient(135deg,#1A0808,#240E0E);"
+        f"border:1px solid #5C1A1A;border-left:4px solid #EF5350;"
+        f"border-radius:12px;padding:14px 18px;margin:4px 0 8px;"
+        f"display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;'>"
+        f"<div style='font-size:28px;flex-shrink:0;'>🔥</div>"
+        f"<div style='flex:1;min-width:180px;'>"
+        f"<div style='font-size:10px;font-weight:700;color:#EF9A9A;"
+        f"text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;'>Wealth Opportunity Cost</div>"
+        f"<div style='font-size:clamp(1rem,3.5vw,1.4rem);font-weight:800;color:#FF5252;margin-bottom:4px;'>"
+        f"{fmt(gap)} missed over 10 years</div>"
+        f"<div style='font-size:12px;color:#B0BEC5;line-height:1.5;'>"
+        f"Spending <b style='color:#EF9A9A;'>{fmt(total_monthly)}/month</b> on subscriptions "
+        f"instead of an Equity SIP costs you <b style='color:#FF5252;'>{fmt(gap)}</b> "
+        f"in potential wealth — equal to {coffees} cups of chai every day!"
+        f"</div></div></div>",
+        unsafe_allow_html=True,
+    )
 
-    # CHARTS
     section("📊 Analytics", "Tap a tab to explore different views")
 
     cfg = {"displayModeBar": False, "responsive": True}
 
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "📈 Wealth Gap", "📊 10Y Projection",
-        "🍩 Spend Mix", "⚖️ Break-Even",
-        "🕸️ Radar", "🌡️ Heatmap",
+        "🍩 Spend Mix",  "⚖️ Break-Even",
+        "🕸️ Radar",      "🌡️ Heatmap",
     ])
 
     with tab1:
-        st.plotly_chart(chart_wealth_gap(total_monthly),
-                        use_container_width=True, config=cfg)
-        infobox(
-            "Shaded area between <b>Total Spent</b> and <b>Equity (12%)</b> "
-            "is your Wealth Gap. Markers show 3Y, 5Y, 10Y portfolio values.",
-            "#4FC3F7",
-        )
+        st.plotly_chart(chart_wealth_gap(total_monthly), use_container_width=True, config=cfg)
+        infobox("Shaded area between <b>Total Spent</b> and <b>Equity (12%)</b> is your Wealth Gap. Markers show 3Y, 5Y, 10Y values.", "#4FC3F7")
 
     with tab2:
-        st.plotly_chart(chart_bar_comparison(portfolio),
-                        use_container_width=True, config=cfg)
-        infobox(
-            "Each group shows what a subscription's monthly cost becomes after "
-            "<b>10 years</b> under FD, Debt, or Equity vs simply spending it.",
-            "#A5D6A7",
-        )
+        st.plotly_chart(chart_bar_comparison(portfolio), use_container_width=True, config=cfg)
+        infobox("Each group shows what a subscription's monthly cost becomes after <b>10 years</b> under each investment type vs simply spending it.", "#A5D6A7")
 
     with tab3:
-        c_l, c_r = st.columns([1, 1])
-        with c_l:
-            st.plotly_chart(chart_donut(portfolio),
-                            use_container_width=True, config=cfg)
-        with c_r:
-            st.plotly_chart(chart_waterfall(portfolio),
-                            use_container_width=True, config=cfg)
-        infobox(
-            "Left: wallet share by category. "
-            "Right: each subscription's individual contribution to monthly burn.",
-            "#6B7A99",
-        )
+        cl, cr = st.columns(2)
+        with cl:
+            st.plotly_chart(chart_donut(portfolio), use_container_width=True, config=cfg)
+        with cr:
+            st.plotly_chart(chart_waterfall(portfolio), use_container_width=True, config=cfg)
+        infobox("Left: wallet share by category. Right: each subscription's share of your monthly burn.", "#6B7A99")
 
     with tab4:
-        st.plotly_chart(chart_break_even(total_monthly),
-                        use_container_width=True, config=cfg)
-        infobox(
-            "<b>Break-even</b> = the month when SIP balance first exceeds total money invested. "
-            "For Equity 12%, compounding kicks in early and the gap only widens.",
-            "#FFB74D",
-        )
+        st.plotly_chart(chart_break_even(total_monthly), use_container_width=True, config=cfg)
+        infobox("<b>Break-even</b> = the month when SIP balance first exceeds total money invested. Equity 12% crosses earliest.", "#FFB74D")
 
     with tab5:
-        st.plotly_chart(chart_radar(total_monthly),
-                        use_container_width=True, config=cfg)
-        infobox(
-            "Spider chart: portfolio SIP value at 1, 3, 5, 10-year milestones "
-            "for all three benchmarks. Larger area = more wealth created.",
-            "#4FC3F7",
-        )
+        st.plotly_chart(chart_radar(total_monthly), use_container_width=True, config=cfg)
+        infobox("Spider chart of portfolio SIP value at 1, 3, 5, and 10-year milestones across all three benchmarks.", "#4FC3F7")
 
     with tab6:
-        st.plotly_chart(chart_heatmap(portfolio),
-                        use_container_width=True, config=cfg)
-        infobox(
-            "Equity SIP growth (12% p.a.) per subscription across year milestones. "
-            "<b>Brighter gold = higher compounded value.</b>",
-            "#FFB74D",
-        )
+        st.plotly_chart(chart_heatmap(portfolio), use_container_width=True, config=cfg)
+        infobox("Equity SIP growth (12% p.a.) per subscription across year milestones. <b>Brighter gold = higher value.</b>", "#FFB74D")
 
-    # Projection table
     section("📋 Full Projection Table")
 
     rows = []
@@ -1147,7 +1005,6 @@ def main():
                 "10Y":          fmt(sip_fv(P, bm["rate"], 120), short=True),
                 "10Y Gain":     fmt(sip_fv(P, bm["rate"], 120) - P * 120, short=True),
             })
-
     for bm_name, bm in BENCHMARKS.items():
         rows.append({
             "Subscription": "🏆 PORTFOLIO TOTAL",
@@ -1161,17 +1018,10 @@ def main():
             "10Y Gain":     fmt(sip_fv(total_monthly, bm["rate"], 120) - total_monthly * 120, short=True),
         })
 
-    df = pd.DataFrame(rows)
-    st.dataframe(df, use_container_width=True,
-                 height=min(520, 60 + len(df) * 36),
-                 hide_index=True)
-    infobox(
-        "Last 3 rows = <b>Portfolio Total</b> — what your combined monthly spend "
-        "would become if invested as a single SIP.",
-        "#FFB74D",
-    )
+    st.dataframe(pd.DataFrame(rows), use_container_width=True,
+                 height=min(520, 60 + len(rows) * 36), hide_index=True)
+    infobox("Last 3 rows = <b>Portfolio Total</b> — combined monthly spend invested as one SIP.", "#FFB74D")
 
-    # Excel export
     section("📥 Download Report")
     c1, c2 = st.columns([1, 2])
     with c1:
@@ -1186,15 +1036,17 @@ def main():
     with c2:
         infobox(
             "Includes:<br>"
-            "• <b>Summary sheet</b> — all subs × FD/Debt/Equity × 1/3/5/10Y + Portfolio Total row<br>"
+            "• <b>Summary sheet</b> — all subs x FD/Debt/Equity x 1/3/5/10Y + Portfolio Total<br>"
             "• <b>Monthly Detail</b> — 120-month compounding for your full portfolio<br>"
             "• Dark-themed formatting, INR currency, freeze panes",
             "#4FC3F7",
         )
 
-    # Footer / Disclaimer
-    st.markdown("<div style='margin-top:48px;border-top:1px solid #1A2340;padding-top:24px;'></div>",
-                unsafe_allow_html=True)
+    # Disclaimer + Footer
+    st.markdown(
+        "<div style='margin-top:48px;border-top:1px solid #1A2340;padding-top:24px;'></div>",
+        unsafe_allow_html=True,
+    )
 
     disclaimer_points = [
         ("Not Investment Advice",
@@ -1205,7 +1057,7 @@ def main():
          "The rates used — 6% (FD), 8% (Debt Fund), 12% (Equity/Index Fund) — are long-term historical "
          "approximations for the Indian market. Actual returns vary based on market conditions, fund selection, "
          "interest rate cycles, inflation, and timing. Equity returns can be negative in any given year."),
-        ("Past Performance is Not a Guarantee",
+        ("Past Performance Is Not a Guarantee",
          "Historical Nifty 50 CAGR of ~12-13% over 20 years does not guarantee future performance. "
          "Debt fund and FD rates fluctuate with RBI monetary policy and broader economic conditions."),
         ("Taxes and Costs Not Modelled",
@@ -1221,8 +1073,7 @@ def main():
     points_html = "".join(
         f"<div style='margin-bottom:12px;'>"
         f"<span style='color:#90A4AE;font-weight:600;'>{title}. </span>"
-        f"<span>{body}</span>"
-        f"</div>"
+        f"<span>{body}</span></div>"
         for title, body in disclaimer_points
     )
 
@@ -1231,9 +1082,8 @@ def main():
         f"border-radius:0 10px 10px 0;padding:18px 22px;max-width:900px;"
         f"margin:0 auto 18px;font-size:12px;color:#607D8B;line-height:1.75;'>"
         f"<div style='font-size:11px;font-weight:700;color:#78909C;text-transform:uppercase;"
-        f"letter-spacing:.09em;margin-bottom:12px;'>⚠️ Important Disclaimer</div>"
-        f"{points_html}"
-        f"</div>",
+        f"letter-spacing:.09em;margin-bottom:12px;'>Important Disclaimer</div>"
+        f"{points_html}</div>",
         unsafe_allow_html=True,
     )
 
