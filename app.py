@@ -1186,60 +1186,61 @@ def main():
         )
 
     # Footer / Disclaimer
-    st.markdown("""
-    <div style="border-top:1px solid #1A2340;margin-top:48px;padding:24px 0 12px;">
+    st.markdown("<div style='margin-top:48px;border-top:1px solid #1A2340;padding-top:24px;'></div>",
+                unsafe_allow_html=True)
 
-        <!-- Disclaimer box -->
-        <div style="background:#0D1120;border:1px solid #1A2340;border-left:3px solid #546E7A;
-                    border-radius:0 10px 10px 0;padding:16px 20px;margin-bottom:18px;
-                    max-width:900px;margin-left:auto;margin-right:auto;">
-            <div style="font-size:11px;font-weight:700;color:#78909C;text-transform:uppercase;
-                        letter-spacing:.09em;margin-bottom:10px;">
-                ⚠️ Important Disclaimer
-            </div>
-            <div style="font-size:12px;color:#607D8B;line-height:1.75;">
-                <b style="color:#78909C;">Not Investment Advice.</b>
-                This tool is built purely for financial education and awareness.
-                Nothing on this page constitutes investment advice, a solicitation to buy or sell
-                any financial product, or a recommendation of any specific mutual fund, FD, or
-                investment scheme.<br><br>
+    disclaimer_points = [
+        ("Not Investment Advice",
+         "This tool is built purely for financial education and awareness. "
+         "Nothing here constitutes investment advice, a solicitation to buy or sell "
+         "any financial product, or a recommendation of any specific mutual fund, FD, or investment scheme."),
+        ("Assumed Returns Are Illustrative",
+         "The rates used — 6% (FD), 8% (Debt Fund), 12% (Equity/Index Fund) — are long-term historical "
+         "approximations for the Indian market. Actual returns vary based on market conditions, fund selection, "
+         "interest rate cycles, inflation, and timing. Equity returns can be negative in any given year."),
+        ("Past Performance is Not a Guarantee",
+         "Historical Nifty 50 CAGR of ~12-13% over 20 years does not guarantee future performance. "
+         "Debt fund and FD rates fluctuate with RBI monetary policy and broader economic conditions."),
+        ("Taxes and Costs Not Modelled",
+         "This calculator does not account for LTCG/STCG tax, exit loads, fund expense ratios, "
+         "TDS on FD interest, or inflation-adjusted real returns. "
+         "Actual post-tax, post-cost returns will be lower than the figures shown."),
+        ("Consult a SEBI-Registered Adviser",
+         "Before making any investment decision, please consult a SEBI-registered Investment Adviser (RIA) "
+         "or a qualified financial planner who can evaluate your personal risk profile, tax bracket, "
+         "time horizon, and financial goals."),
+    ]
 
-                <b style="color:#78909C;">Assumed Returns Are Illustrative.</b>
-                The return rates used — 6% (FD), 8% (Debt Fund), 12% (Equity/Index Fund) —
-                are long-term historical approximations for the Indian market.
-                Actual returns vary significantly based on market conditions, fund selection,
-                interest rate cycles, inflation, and investment timing.
-                Equity returns in particular can be negative in any given year.<br><br>
+    points_html = "".join(
+        f"<div style='margin-bottom:12px;'>"
+        f"<span style='color:#90A4AE;font-weight:600;'>{title}. </span>"
+        f"<span>{body}</span>"
+        f"</div>"
+        for title, body in disclaimer_points
+    )
 
-                <b style="color:#78909C;">Past Performance ≠ Future Results.</b>
-                Historical data on Indian equity indices (e.g. Nifty 50 CAGR ~12–13% over 20 years)
-                does not guarantee similar future performance.
-                Debt fund and FD rates fluctuate with RBI monetary policy.<br><br>
+    st.markdown(
+        f"<div style='background:#0D1120;border:1px solid #1A2340;border-left:3px solid #546E7A;"
+        f"border-radius:0 10px 10px 0;padding:18px 22px;max-width:900px;"
+        f"margin:0 auto 18px;font-size:12px;color:#607D8B;line-height:1.75;'>"
+        f"<div style='font-size:11px;font-weight:700;color:#78909C;text-transform:uppercase;"
+        f"letter-spacing:.09em;margin-bottom:12px;'>⚠️ Important Disclaimer</div>"
+        f"{points_html}"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
 
-                <b style="color:#78909C;">No Taxes or Costs Modelled.</b>
-                This calculator does not account for LTCG/STCG tax, exit loads, expense ratios,
-                TDS on FD interest, or inflation-adjusted real returns.
-                Real post-tax, post-cost returns will be lower than shown.<br><br>
-
-                <b style="color:#78909C;">Consult a Professional.</b>
-                Before making any investment decision, please consult a
-                <b style="color:#78909C;">SEBI-registered Investment Adviser (RIA)</b>
-                or a qualified financial planner who can assess your personal risk profile,
-                tax situation, and financial goals.
-            </div>
-        </div>
-
-        <!-- Formula + credits row -->
-        <div style="text-align:center;color:#37474F;font-size:11px;line-height:1.9;">
-            <b style="color:#546E7A;">Formula used:</b>
-            FV = P × [((1 + r)ⁿ − 1) / r] × (1 + r) &nbsp;·&nbsp;
-            Monthly compounding &nbsp;·&nbsp;
-            Inspired by Sandeep Jethwani's Subscription Economy analysis<br>
-            Built with Streamlit, Plotly &amp; Pandas &nbsp;·&nbsp;
-            Prices sourced from public databases and may not reflect current rates
-        </div>
-
-    </div>""", unsafe_allow_html=True)
+    st.markdown(
+        "<div style='text-align:center;color:#37474F;font-size:11px;line-height:1.9;padding-bottom:8px;'>"
+        "<b style='color:#546E7A;'>Formula:</b> "
+        "FV = P \u00d7 [((1 + r)\u207f \u2212 1) / r] \u00d7 (1 + r) \u00a0\u00b7\u00a0 "
+        "Monthly compounding \u00a0\u00b7\u00a0 "
+        "Inspired by Sandeep Jethwani's Subscription Economy analysis<br>"
+        "Built with Streamlit, Plotly &amp; Pandas \u00a0\u00b7\u00a0 "
+        "Prices from public databases and may not reflect current rates"
+        "</div>",
+        unsafe_allow_html=True,
+    )
 
 
 if __name__ == "__main__":
