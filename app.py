@@ -811,7 +811,10 @@ def main():
             </div>
 
             <!-- Contact Us button -->
-            <a class="qbtn" href="#for-queries">📬 Contact Us</a>
+            <a class="qbtn" href="javascript:void(0)"
+               onclick="window.parent.document.getElementById('for-queries').scrollIntoView({behavior:'smooth'});">
+              📬 Contact Us
+            </a>
 
           </div>
         </div>
@@ -1181,11 +1184,7 @@ def main():
         "<div style='background:#060A14;border:1px solid #1A2340;border-radius:10px;"
         "padding:14px 22px;max-width:900px;margin:8px auto 18px;"
         "text-align:center;font-size:11px;color:#546E7A;line-height:2;'>"
-        "<span style='color:#4FC3F7;font-weight:700;'>Formula:</span> "
-        "FV = P \u00d7 [((1 + r)\u207f \u2212 1) / r] \u00d7 (1 + r)"
-        " &nbsp;&middot;&nbsp; Monthly compounding"
-        " &nbsp;&middot;&nbsp; Inspired by Sandeep Jethwani's Subscription Economy analysis<br>"
-        "<span style='color:#37474F;'>Built with Streamlit, Plotly &amp; Pandas"
+        
         " &nbsp;&middot;&nbsp; Prices from public databases and may not reflect current rates</span>"
         "</div>",
         unsafe_allow_html=True,
