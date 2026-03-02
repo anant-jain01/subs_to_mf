@@ -3,7 +3,6 @@ Subscription Opportunity Cost Calculator - India Edition
 Mobile-first, deployment-ready Streamlit app.
 """
 
-import base64
 import io
 import os
 import numpy as np
@@ -19,13 +18,6 @@ except ImportError:
     SCRAPING_AVAILABLE = False
 
 
-def _logo_b64() -> str:
-    """Return base64-encoded logo.png, or empty string if not found."""
-    logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
-    if not os.path.exists(logo_path):
-        return ""
-    with open(logo_path, "rb") as f:
-        return base64.b64encode(f.read()).decode()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # DATA
@@ -753,9 +745,10 @@ def main():
     st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
 
     # ── Top contact bar ────────────────────────────────────────────────────────
-    st.markdown(
+    import streamlit.components.v1 as _components
+    _components.html(
         "<div style='background:#080C18;border-bottom:1px solid #1A2340;"
-        "padding:5px 20px;font-size:10.5px;color:#6B7A99;"
+        "padding:5px 20px;font-size:10.5px;color:#6B7A99;font-family:sans-serif;"
         "display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;'>"
         "<span>📍 B1/H3 Mohan Co-op Industrial Area, Mathura Road, New Delhi – 110044</span>"
         "<span>&middot;</span>"
@@ -765,21 +758,16 @@ def main():
         "<span>&middot;</span>"
         "<span>🌐 <a href='https://www.3kip.in' target='_blank' style='color:#4FC3F7;text-decoration:none;'>www.3kip.in</a></span>"
         "</div>",
-        unsafe_allow_html=True,
+        height=36,
+        scrolling=False,
     )
 
     # ── Hero header ────────────────────────────────────────────────────────────
-    _logo = _logo_b64()
     logo_col, title_col = st.columns([1, 5])
     with logo_col:
-        if _logo:
-            st.markdown(
-                f"<div style='padding:10px 0 4px;'>"
-                f"<img src='data:image/png;base64,{_logo}' "
-                f"style='max-height:70px;max-width:100%;width:auto;object-fit:contain;display:block;'>"
-                f"</div>",
-                unsafe_allow_html=True,
-            )
+        logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.png")
+        if os.path.exists(logo_path):
+            st.image(logo_path, use_container_width=True)
     with title_col:
         st.markdown(
             "<div style='background:linear-gradient(135deg,#0F1629 0%,#0A0E1A 100%);"
