@@ -759,30 +759,28 @@ def main():
     )
     _components.html(
         f"""
-        <div style="margin:0;padding:0;font-family:'Segoe UI',sans-serif;background:#0A0E1A;">
-          <!-- contact bar -->
-          <div style="background:#080C18;border-bottom:1px solid #1A2340;
-                      padding:5px 20px;font-size:10px;color:#6B7A99;
-                      display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;">
+        <div style="margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;background:#0A0E1A;">
+          <div style="background:#060A14;border-bottom:1px solid #243050;
+                      padding:6px 20px;font-size:10.5px;color:#90A4AE;
+                      display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center;">
             <span>📍 B1/H3 Mohan Co-op Industrial Area, Mathura Road, New Delhi – 110044</span>
-            <span style="color:#1A2340;">|</span>
-            <span>📞 <a href="tel:+919315569603" style="color:#6B7A99;text-decoration:none;">+91 93155 69603</a></span>
-            <span style="color:#1A2340;">|</span>
-            <span>📧 <a href="mailto:support@3kip.in" style="color:#6B7A99;text-decoration:none;">support@3kip.in</a></span>
-            <span style="color:#1A2340;">|</span>
+            <span style="color:#4FC3F7;">|</span>
+            <span>📞 <a href="tel:+919315569603" style="color:#90A4AE;text-decoration:none;">+91 93155 69603</a></span>
+            <span style="color:#4FC3F7;">|</span>
+            <span>📧 <a href="mailto:support@3kip.in" style="color:#90A4AE;text-decoration:none;">support@3kip.in</a></span>
+            <span style="color:#4FC3F7;">|</span>
             <span>🌐 <a href="https://www.3kip.in" target="_blank" style="color:#4FC3F7;text-decoration:none;">www.3kip.in</a></span>
           </div>
-          <!-- hero row -->
-          <div style="display:flex;align-items:center;gap:18px;padding:14px 20px 12px;
+          <div style="display:flex;align-items:center;gap:18px;padding:12px 20px 10px;
                       background:linear-gradient(135deg,#0F1629 0%,#0A0E1A 100%);
                       border-bottom:1px solid #1A2340;flex-wrap:wrap;">
             {_logo_tag}
             <div style="flex:1;min-width:200px;">
-              <div style="color:#FFFFFF;margin:0;font-size:clamp(1.1rem,3.5vw,1.6rem);
+              <div style="color:#FFFFFF;font-size:clamp(1.1rem,3.5vw,1.55rem);
                           font-weight:800;letter-spacing:-.02em;line-height:1.2;">
                 📊 Subscription Opportunity Cost
               </div>
-              <div style="color:#6B7A99;margin:4px 0 0;font-size:11.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <div style="color:#6B7A99;margin:4px 0 0;font-size:11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                 <span>India Edition &middot; What your subscriptions could build as SIPs</span>
                 <span style="background:#141C35;border:1px solid #1E2D50;border-radius:20px;
                              padding:3px 10px;font-size:10px;color:#4FC3F7;font-weight:600;
@@ -794,7 +792,7 @@ def main():
           </div>
         </div>
         """,
-        height=110,
+        height=120,
         scrolling=False,
     )
 
@@ -1140,7 +1138,22 @@ def main():
     )
 
     st.markdown(
-        "<div style='text-align:center;color:#37474F;font-size:11px;line-height:1.9;padding-bottom:8px;'>"
+        "<div style='background:#0D1120;border:1px solid #1A2340;border-left:4px solid #4FC3F7;"
+        "border-radius:0 10px 10px 0;padding:18px 22px;max-width:900px;margin:16px auto 8px;'>"
+        "<div style='font-size:12px;font-weight:700;color:#4FC3F7;text-transform:uppercase;"
+        "letter-spacing:.09em;margin-bottom:10px;'>📬 For Queries</div>"
+        "<div style='font-size:12px;color:#90A4AE;line-height:2;'>"
+        "<span>📍 B1/H3 Mohan Co-operative Industrial Area, Block B, Mathura Road, New Delhi – 110044, India</span><br>"
+        "<span>📞 <a href='tel:+919315569603' style='color:#90A4AE;text-decoration:none;'>+91 93155 69603</a></span>"
+        "&nbsp;&nbsp;|&nbsp;&nbsp;"
+        "<span>📧 <a href='mailto:support@3kip.in' style='color:#4FC3F7;text-decoration:none;'>support@3kip.in</a></span>"
+        "&nbsp;&nbsp;|&nbsp;&nbsp;"
+        "<span>🌐 <a href='https://www.3kip.in' target='_blank' style='color:#4FC3F7;text-decoration:none;'>www.3kip.in</a></span>"
+        "</div></div>",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
         "<b style='color:#546E7A;'>Formula:</b> "
         "FV = P \u00d7 [((1 + r)\u207f \u2212 1) / r] \u00d7 (1 + r) \u00a0\u00b7\u00a0 "
         "Monthly compounding \u00a0\u00b7\u00a0 "
